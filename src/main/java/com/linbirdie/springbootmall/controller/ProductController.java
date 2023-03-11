@@ -36,6 +36,7 @@ public class ProductController {
     }
 
     //@Valid 一定要加在參數前面，這樣才能確保ProductRequest裏＠NotNull註解可以生效
+    //@RequestBody 是為了要去接住前端傳往後端的json 參數
     @PostMapping("/products")
     public ResponseEntity<Product> creatProduct(@RequestBody @Valid ProductRequest productRequest){
         Integer productId = productService.createProduct(productRequest);
@@ -45,6 +46,28 @@ public class ProductController {
         //將創建好的produtc 資料回傳給前端
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
 
+
+    }
+
+    // 因為ProductRequest 有限制前端允許修改的product 內容
+    //像是productId 就是不被允許更動的product 資訊
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
+                                                 @RequestBody @Valid ProductRequest productRequest){
+
+        Product product = productService.getProductByID(productId);
+
+        //先檢查商品是否存在於資料庫中
+        if(product == null){
+            //回傳404 給前端
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        productService.updateProduct(productId, productRequest);
+
+        Product updatedProduct = productService.getProductByID(productId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedProduct);
 
     }
 
