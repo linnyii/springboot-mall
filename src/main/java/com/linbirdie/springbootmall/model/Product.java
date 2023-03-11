@@ -1,15 +1,23 @@
 package com.linbirdie.springbootmall.model;
 
+import com.linbirdie.springbootmall.constant.ProductCategory;
+
 import java.util.Date;
 
 public class Product {
 
     private Integer productID;
     private String productName;
-    private String category;
+    //將category String type 調整成 enum ProductCategory
+    //好處：之後的人可以更清楚知道category 有哪些類型
+    //如做更改，一定要一起檢查RowMapper class，因為當初從資料庫取出時String類型，現在要求為ProductCategory類型
+    private ProductCategory category;
     private String imageUrl;
     private Integer price;
     private Integer stock;
+    private String description;
+    private Date createDate;
+    private Date lastModifiedDate;
 
     public Integer getProductID() {
         return productID;
@@ -27,11 +35,11 @@ public class Product {
         this.productName = productName;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 
@@ -83,8 +91,6 @@ public class Product {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    private String description;
-    private Date createDate;
-    private Date lastModifiedDate;
+
 
 }

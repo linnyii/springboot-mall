@@ -1,5 +1,6 @@
 package com.linbirdie.springbootmall.rowmapper;
 
+import com.linbirdie.springbootmall.constant.ProductCategory;
 import com.linbirdie.springbootmall.model.Product;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -19,7 +20,15 @@ public class ProductRowMapper implements RowMapper<Product> {
 
         product.setProductID(resultSet.getInt("product_id"));
         product.setProductName(resultSet.getString("product_name"));
-        product.setCategory(resultSet.getString("category"));
+
+        //String 轉Enum
+        //也可以更精簡的寫成
+        //Product.setCategory(ProductCategory.valueOf(resultSet.getString("category")));
+        String categoryStr = resultSet.getString("category");
+        ProductCategory category = ProductCategory.valueOf(categoryStr);
+        product.setCategory(category);
+
+
         product.setImageUrl(resultSet.getString("image_url"));
         product.setPrice(resultSet.getInt("price"));
         product.setStock(resultSet.getInt("stock"));
