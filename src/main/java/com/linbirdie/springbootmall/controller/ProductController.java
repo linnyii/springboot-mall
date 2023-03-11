@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 //@RestController 表示此為Controller layer 的bean
 @RestController
@@ -16,6 +17,18 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> getProduct(){
+
+        //注意
+        //這邊不用像底下getProduct function （查詢單個productId）一樣去檢查使否為null
+        //都需要回覆ok status
+        //RESTful 設計理念
+        List<Product> productList = productService.getProducts();
+
+        return ResponseEntity.status(HttpStatus.OK).body(productList);
+    }
 
 
     @GetMapping("/products/{productId}")
