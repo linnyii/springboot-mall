@@ -1,6 +1,7 @@
 package com.linbirdie.springbootmall.controller;
 
 import com.linbirdie.springbootmall.constant.ProductCategory;
+import com.linbirdie.springbootmall.dao.ProductQueryParams;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.service.ProductService;
@@ -28,12 +29,18 @@ public class ProductController {
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search
     ){
+        //將傳進來的各參數都用一個object裝起來
+        //然後於需要呼叫的方法丟入productQueryParams這個參數
+        //這樣做的優點在於，不管前端傳進來多少個參數，都不用害怕之後要呼叫的方法的參數有少放，參數值只要塞進一整個存放參數的object 就好
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
 
         //注意
         //這邊不用像底下getProduct function （查詢單個productId）一樣去檢查使否為null
         //都需要回覆ok status
         //RESTful 設計理念
-        List<Product> productList = productService.getProducts(category, search);
+        List<Product> productList = productService.getProducts(productQueryParams);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }

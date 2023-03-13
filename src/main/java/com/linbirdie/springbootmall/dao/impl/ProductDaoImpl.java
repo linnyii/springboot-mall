@@ -1,6 +1,6 @@
 package com.linbirdie.springbootmall.dao.impl;
-import com.linbirdie.springbootmall.constant.ProductCategory;
 import com.linbirdie.springbootmall.dao.ProductDao;
+import com.linbirdie.springbootmall.dao.ProductQueryParams;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.rowmapper.ProductRowMapper;
@@ -25,7 +25,7 @@ public class ProductDaoImpl implements ProductDao {
 
 
     @Override
-    public List<Product> getProducts(ProductCategory category, String search) {
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id, product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date " +
                 "FROM product WHERE 1=1";
@@ -36,16 +36,16 @@ public class ProductDaoImpl implements ProductDao {
 
         //一定要先檢查是否為null
         //因為Controller layer 的這些參數並不是必要的，可為空
-        if(category != null){
+        if(productQueryParams.getCategory() != null){
             sql = sql + " AND category = :category"; //注意，AND 前面的空格很重要，一定要留，才不會跟sql之前的查詢條件黏在一起
-            map.put("category", category.name()); // 因為category 為Enum類型，要使用name()轉換成字串
+            map.put("category", productQueryParams.getCategory().name()); // 因為category 為Enum類型，要使用name()轉換成字串
         }
 
         //一定要先檢查是否為null
         //因為Controller layer 的這些參數並不是必要的，可為空
-        if(search != null){
+        if(productQueryParams.getSearch() != null){
             sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
-            map.put("search", "%" + search + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
+            map.put("search", "%" + productQueryParams.getSearch() + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
         }
         //邏輯打結
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
