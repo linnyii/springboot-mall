@@ -47,6 +47,13 @@ public class ProductDaoImpl implements ProductDao {
             sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
             map.put("search", "%" + productQueryParams.getSearch() + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
         }
+
+        //這裡不用if 判斷，因為在controller layer 我們有給予這兩個參數default value，所以不管怎樣都會有值
+        //注意，當使用ORDER BY 語法時，只能像底下的寫法，用拼接式的寫法，不能像上面的查詢句子一樣寫整串
+        //可能是Spring JDBC 在設計上的限制
+        //注意sql 語法的空格保留
+        sql = sql + " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
+
         //邏輯打結
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 

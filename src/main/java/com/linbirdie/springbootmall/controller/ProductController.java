@@ -23,11 +23,21 @@ public class ProductController {
     // 參數： @RequestParam ProductCategory category ->為必要的參數
     // @RequestParam(required = false) ProductCategory category ->為可選擇參數，可有可無，當無category參數時，會回傳所有商品
     //SpringBoot 會自動把前端傳過來的category 資訊轉換成ProductCategory 的Enum 型態，讓我們使用。
-    //
+    //String orderBy 要以DB中哪個欄位來排序
+    //String sort 要升冪還是降冪
+    //(defaultValue = "created_date")->參考課程4-7
+    //(defaultValue = "created_date") 假如前端沒有要求orderBy，則default 呈現最新的資料（依照商業邏輯不同）
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getProduct(
+            //查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
-            @RequestParam(required = false) String search
+            @RequestParam(required = false) String search,
+
+            //排序Sorting
+            // String orderBy 目前知單排序設計，在業界也很常使用
+            //如果要多個欄位條件進行排序會比較麻煩，需要另外查詢做法
+            @RequestParam (defaultValue = "created_date")String orderBy,
+            @RequestParam (defaultValue = "desc")String sort
     ){
         //將傳進來的各參數都用一個object裝起來
         //然後於需要呼叫的方法丟入productQueryParams這個參數
@@ -35,6 +45,8 @@ public class ProductController {
         ProductQueryParams productQueryParams = new ProductQueryParams();
         productQueryParams.setCategory(category);
         productQueryParams.setSearch(search);
+        productQueryParams.setOrderBy(orderBy);
+        productQueryParams.setSort(sort);
 
         //注意
         //這邊不用像底下getProduct function （查詢單個productId）一樣去檢查使否為null
