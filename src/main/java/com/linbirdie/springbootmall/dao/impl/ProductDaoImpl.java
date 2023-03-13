@@ -1,4 +1,5 @@
 package com.linbirdie.springbootmall.dao.impl;
+import com.linbirdie.springbootmall.constant.ProductCategory;
 import com.linbirdie.springbootmall.dao.ProductDao;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
@@ -24,12 +25,28 @@ public class ProductDaoImpl implements ProductDao {
 
 
     @Override
-    public List<Product> getProducts() {
+    public List<Product> getProducts(ProductCategory category, String search) {
         String sql = "SELECT product_id, product_name, category, image_url, price, stock, description, " +
-                "created_date, last_modified_date FROM product";
+                "created_date, last_modified_date " +
+                "FROM product WHERE 1=1";
+        //加上WHERE 1=1 的查詢結果會與沒有加上此串的查詢結果一模一樣
+        //而加上WHERE 1=1 的目的在於要利用以下的sql語法直接加上我們想額外加上的查詢條件
 
         Map<String, Object> map = new HashMap<>();
 
+        //一定要先檢查是否為null
+        //因為Controller layer 的這些參數並不是必要的，可為空
+        if(category != null){
+            sql = sql + " AND category = :category"; //注意，AND 前面的空格很重要，一定要留，才不會跟sql之前的查詢條件黏在一起
+            map.put("category", category.name()); // 因為category 為Enum類型，要使用name()轉換成字串
+        }
+
+        //一定要先檢查是否為null
+        //因為Controller layer 的這些參數並不是必要的，可為空
+        if(search != null){
+            sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
+            map.put("search", "%" + search + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
+        }
         //邏輯打結
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 

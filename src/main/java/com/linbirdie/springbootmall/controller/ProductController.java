@@ -1,5 +1,6 @@
 package com.linbirdie.springbootmall.controller;
 
+import com.linbirdie.springbootmall.constant.ProductCategory;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.service.ProductService;
@@ -18,14 +19,21 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    // 參數： @RequestParam ProductCategory category ->為必要的參數
+    // @RequestParam(required = false) ProductCategory category ->為可選擇參數，可有可無，當無category參數時，會回傳所有商品
+    //SpringBoot 會自動把前端傳過來的category 資訊轉換成ProductCategory 的Enum 型態，讓我們使用。
+    //
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProduct(){
+    public ResponseEntity<List<Product>> getProduct(
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String search
+    ){
 
         //注意
         //這邊不用像底下getProduct function （查詢單個productId）一樣去檢查使否為null
         //都需要回覆ok status
         //RESTful 設計理念
-        List<Product> productList = productService.getProducts();
+        List<Product> productList = productService.getProducts(category, search);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }
