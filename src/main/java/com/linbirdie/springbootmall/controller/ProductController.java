@@ -8,11 +8,16 @@ import com.linbirdie.springbootmall.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 
+//4-13 課程複習@Validated，加上這個annotation 才能使＠Max @Min 註解生效
+@Validated
 //@RestController 表示此為Controller layer 的bean
 @RestController
 public class ProductController {
@@ -37,7 +42,15 @@ public class ProductController {
             // String orderBy 目前知單排序設計，在業界也很常使用
             //如果要多個欄位條件進行排序會比較麻煩，需要另外查詢做法
             @RequestParam (defaultValue = "created_date")String orderBy,
-            @RequestParam (defaultValue = "desc")String sort
+            @RequestParam (defaultValue = "desc")String sort,
+
+            //分頁Pagination
+            //limit 取得幾筆數據
+            //offset 要跳過幾筆數據
+            //SELECT * FROM product LIMIT 2 OFFSET 3 表示從第三筆數據開始，只取出兩筆數據
+            //4-13 複習@Max @Min
+            @RequestParam (defaultValue = "5")@Max(1000) @Min(0)Integer limit,
+            @RequestParam (defaultValue = "0")@Min(0)Integer offset
     ){
         //將傳進來的各參數都用一個object裝起來
         //然後於需要呼叫的方法丟入productQueryParams這個參數
@@ -47,6 +60,8 @@ public class ProductController {
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
+        productQueryParams.setLimit(limit);
+        productQueryParams.setOffset(offset);
 
         //注意
         //這邊不用像底下getProduct function （查詢單個productId）一樣去檢查使否為null
