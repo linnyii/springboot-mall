@@ -5,6 +5,7 @@ import com.linbirdie.springbootmall.dao.ProductQueryParams;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.service.ProductService;
+import com.linbirdie.springbootmall.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,10 @@ public class ProductController {
     //String sort 要升冪還是降冪
     //(defaultValue = "created_date")->參考課程4-7
     //(defaultValue = "created_date") 假如前端沒有要求orderBy，則default 呈現最新的資料（依照商業邏輯不同）
+    //把原本回傳ResponseEntityList<Product> 進一步改成 ResponseEntity<Page<Product>>，內容除了Product list 之外，
+    //多了limit, offset, total 等資訊
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProduct(
+    public ResponseEntity<Page<Product>> getProduct(
             //查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search,
@@ -69,7 +72,20 @@ public class ProductController {
         //RESTful 設計理念
         List<Product> productList = productService.getProducts(productQueryParams);
 
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+        //因為會依照前端所船隻查詢條件而改變，所以還是要放入productQueryParams 參數
+        Integer total = productService.countProduct(productQueryParams);
+        //不能直接利用.size()來取得total，因為目前的productList 是有受到limit＆offset 的限制才回傳的List
+        //並不是資料庫裡面正確得總筆數
+        //Integer total = productList.size();
+
+        //分頁
+        Page<Product> page = new Page<>();
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResults(productList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 

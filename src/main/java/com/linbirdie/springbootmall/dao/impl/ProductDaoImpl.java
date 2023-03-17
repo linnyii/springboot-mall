@@ -20,9 +20,36 @@ import java.util.Map;
 @Component
 public class ProductDaoImpl implements ProductDao {
 
+
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+
+    @Override
+    public Integer countProduct(ProductQueryParams productQueryParams) {
+        String sql = "SELECT count(*) FROM product WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+
+        //一定要先檢查是否為null
+        //因為Controller layer 的這些參數並不是必要的，可為空
+        //查詢條件
+        if(productQueryParams.getCategory() != null){
+            sql = sql + " AND category = :category"; //注意，AND 前面的空格很重要，一定要留，才不會跟sql之前的查詢條件黏在一起
+            map.put("category", productQueryParams.getCategory().name()); // 因為category 為Enum類型，要使用name()轉換成字串
+        }
+
+        //一定要先檢查是否為null
+        //因為Controller layer 的這些參數並不是必要的，可為空
+        if(productQueryParams.getSearch() != null){
+            sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
+            map.put("search", "%" + productQueryParams.getSearch() + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
+        }
+
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class); // 代表將所取得的值，轉換成Integer class 並回傳
+
+        return total;
+    }
 
     @Override
     public List<Product> getProducts(ProductQueryParams productQueryParams) {
