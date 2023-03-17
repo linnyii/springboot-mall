@@ -31,20 +31,7 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        //一定要先檢查是否為null
-        //因為Controller layer 的這些參數並不是必要的，可為空
-        //查詢條件
-        if(productQueryParams.getCategory() != null){
-            sql = sql + " AND category = :category"; //注意，AND 前面的空格很重要，一定要留，才不會跟sql之前的查詢條件黏在一起
-            map.put("category", productQueryParams.getCategory().name()); // 因為category 為Enum類型，要使用name()轉換成字串
-        }
-
-        //一定要先檢查是否為null
-        //因為Controller layer 的這些參數並不是必要的，可為空
-        if(productQueryParams.getSearch() != null){
-            sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
-            map.put("search", "%" + productQueryParams.getSearch() + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class); // 代表將所取得的值，轉換成Integer class 並回傳
 
@@ -61,20 +48,7 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        //一定要先檢查是否為null
-        //因為Controller layer 的這些參數並不是必要的，可為空
-        //查詢條件
-        if(productQueryParams.getCategory() != null){
-            sql = sql + " AND category = :category"; //注意，AND 前面的空格很重要，一定要留，才不會跟sql之前的查詢條件黏在一起
-            map.put("category", productQueryParams.getCategory().name()); // 因為category 為Enum類型，要使用name()轉換成字串
-        }
-
-        //一定要先檢查是否為null
-        //因為Controller layer 的這些參數並不是必要的，可為空
-        if(productQueryParams.getSearch() != null){
-            sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
-            map.put("search", "%" + productQueryParams.getSearch() + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         //這裡不用if 判斷，因為在controller layer 我們有給予這兩個參數default value，所以不管怎樣都會有值
         //注意，當使用ORDER BY 語法時，只能像底下的寫法，用拼接式的寫法，不能像上面的查詢句子一樣寫整串
@@ -183,6 +157,31 @@ public class ProductDaoImpl implements ProductDao {
 
         namedParameterJdbcTemplate.update(sql, map);
 
+    }
 
+    //因為getProducts() & countProduct（) 兩個方法會使用到一模樣的sql 語法，
+    //所以可以重構程式碼變成一個function 去呼叫
+    //避免未來在維護程式碼上的困難，也可以達到程式碼的重複利用
+    //維護程式碼上的困難: 避免工程師修改getProducts()sql時，忘記要同時修改countProduct()
+    //private 可以確保只有這個class才可以使用這個方法，可以確保之後要刪除時，不會影響到別的class
+    //public 方法就需要考量刪除時，可能會影響到別的class裏的方法
+    private String addFilteringSql(String sql, Map<String, Object>map, ProductQueryParams productQueryParams){
+
+        //一定要先檢查是否為null
+        //因為Controller layer 的這些參數並不是必要的，可為空
+        //查詢條件
+        if(productQueryParams.getCategory() != null){
+            sql = sql + " AND category = :category"; //注意，AND 前面的空格很重要，一定要留，才不會跟sql之前的查詢條件黏在一起
+            map.put("category", productQueryParams.getCategory().name()); // 因為category 為Enum類型，要使用name()轉換成字串
+        }
+
+        //一定要先檢查是否為null
+        //因為Controller layer 的這些參數並不是必要的，可為空
+        if(productQueryParams.getSearch() != null){
+            sql = sql + " AND product_name LIKE :search"; //LIKE 語法通常會搭配%使用，模糊查詢，只要有包含關鍵字的商品名稱皆可
+            map.put("search", "%" + productQueryParams.getSearch() + "%"); // 模糊查詢效果，% 不能寫在sql 語句裡，必須在map裡（Spring JDBC Template 限制）
+        }
+
+        return sql;
     }
 }
