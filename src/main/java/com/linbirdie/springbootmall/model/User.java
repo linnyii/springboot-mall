@@ -1,11 +1,20 @@
 package com.linbirdie.springbootmall.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 
 public class User {
 
     private Integer userId;
+
+    //可以把回傳給前端的email key 改為 e_mail
+    @JsonProperty("e_mail")
     private String email;
+
+    //可以將password 隱藏起來，不會將此資訊返回給前端
+    @JsonIgnore
     private String password;
     private Date createDate;
     private Date lastModifiedDate;

@@ -1,5 +1,6 @@
 package com.linbirdie.springbootmall.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 public class UserRegisterRequest {
@@ -7,7 +8,9 @@ public class UserRegisterRequest {
     // 4-13 課程複習
     //@NotNull 不可為空
     //@NotBlank 不可為空也不可為空白字串
+    //@Email 檢查是否為正規email 格式
     @NotBlank
+    @Email
     private String email;
     @NotBlank
     private String password;
