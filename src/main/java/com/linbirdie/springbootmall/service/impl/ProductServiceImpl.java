@@ -1,7 +1,7 @@
 package com.linbirdie.springbootmall.service.impl;
 
 import com.linbirdie.springbootmall.dao.ProductDao;
-import com.linbirdie.springbootmall.dao.ProductQueryParams;
+import com.linbirdie.springbootmall.dto.ProductQueryParams;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.service.ProductService;

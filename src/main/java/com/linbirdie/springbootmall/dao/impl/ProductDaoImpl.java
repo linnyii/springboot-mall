@@ -1,6 +1,6 @@
 package com.linbirdie.springbootmall.dao.impl;
 import com.linbirdie.springbootmall.dao.ProductDao;
-import com.linbirdie.springbootmall.dao.ProductQueryParams;
+import com.linbirdie.springbootmall.dto.ProductQueryParams;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.rowmapper.ProductRowMapper;
@@ -11,7 +11,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.security.spec.NamedParameterSpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;

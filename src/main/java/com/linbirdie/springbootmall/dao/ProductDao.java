@@ -1,5 +1,6 @@
 package com.linbirdie.springbootmall.dao;
 
+import com.linbirdie.springbootmall.dto.ProductQueryParams;
 import com.linbirdie.springbootmall.dto.ProductRequest;
 import com.linbirdie.springbootmall.model.Product;
 

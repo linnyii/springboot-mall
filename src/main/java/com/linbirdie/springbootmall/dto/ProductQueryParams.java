@@ -1,4 +1,4 @@
-package com.linbirdie.springbootmall.dao;
+package com.linbirdie.springbootmall.dto;
 
 import com.linbirdie.springbootmall.constant.ProductCategory;
 
