@@ -13,3 +13,18 @@ CREATE TABLE IF NOT EXISTS product
     created_date       TIMESTAMP    NOT NULL,
     last_modified_date TIMESTAMP    NOT NULL
     );
+
+--補充
+--MySQL與H2基本上是兩家不同的廠商開發，所以在語法上可能會有一些微小的差異
+--所以在創建H2 資料庫時需要稍加注意
+--例如MySQL UNIQUE KEY 表示唯一
+--則H2 為UNIQUE
+
+CREATE TABLE IF NOT EXISTS user
+(
+    user_id            INT          NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    email              VARCHAR(256) NOT NULL UNIQUE,
+    password           VARCHAR(256) NOT NULL,
+    created_date       TIMESTAMP    NOT NULL,
+    last_modified_date TIMESTAMP    NOT NULL
+    );
