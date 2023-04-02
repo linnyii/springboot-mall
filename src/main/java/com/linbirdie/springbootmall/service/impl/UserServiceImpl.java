@@ -1,6 +1,7 @@
 package com.linbirdie.springbootmall.service.impl;
 
 import com.linbirdie.springbootmall.dao.UserDao;
+import com.linbirdie.springbootmall.dto.UserLoginRequest;
 import com.linbirdie.springbootmall.dto.UserRegisterRequest;
 import com.linbirdie.springbootmall.model.User;
 import com.linbirdie.springbootmall.service.UserService;
@@ -10,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+
+//補充：
+//Service layer 通常是最複雜的一層，在這裡可能會運用許多的if-else 進行商業邏輯判斷
+//Dao layer 只能用於跟資料庫做溝通，要避免其他的商業邏輯判斷。
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -39,5 +44,28 @@ public class UserServiceImpl implements UserService {
         }
 
         return userDao.createUser(userRegisterRequest) ;
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+
+        //meas this user is not existing in DB
+        if(user == null){
+            log.warn("this mail {} is not registered", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        //比較兩個字串是否一致時，記得使用equals
+        if(user.getPassword().equals(userLoginRequest.getPassword())){
+
+            return user;
+        }
+        else{
+
+            log.warn("the input password of {} is not correct", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
