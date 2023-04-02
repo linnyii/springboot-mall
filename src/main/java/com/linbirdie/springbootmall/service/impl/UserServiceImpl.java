@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.nio.charset.StandardCharsets;
 
 //補充：
 //Service layer 通常是最複雜的一層，在這裡可能會運用許多的if-else 進行商業邏輯判斷
@@ -43,6 +46,10 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
+        //使用MD5 生成密碼的雜湊值
+        String hashedPassword = DigestUtils.md5DigestAsHex(userRegisterRequest.getPassword().getBytes());
+        userRegisterRequest.setPassword(hashedPassword);
+
         return userDao.createUser(userRegisterRequest) ;
     }
 
@@ -50,14 +57,17 @@ public class UserServiceImpl implements UserService {
     public User login(UserLoginRequest userLoginRequest) {
         User user = userDao.getUserByEmail(userLoginRequest.getEmail());
 
-        //meas this user is not existing in DB
+        //means this user is not existing in DB
         if(user == null){
             log.warn("this mail {} is not registered", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
+        //比較密碼是否正確
         //比較兩個字串是否一致時，記得使用equals
-        if(user.getPassword().equals(userLoginRequest.getPassword())){
+        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+
+        if(user.getPassword().equals(hashedPassword)){
 
             return user;
         }
