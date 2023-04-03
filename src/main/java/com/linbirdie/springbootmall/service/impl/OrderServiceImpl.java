@@ -4,6 +4,7 @@ import com.linbirdie.springbootmall.dao.OrderDao;
 import com.linbirdie.springbootmall.dao.ProductDao;
 import com.linbirdie.springbootmall.dto.BuyItem;
 import com.linbirdie.springbootmall.dto.CreateOrderRequest;
+import com.linbirdie.springbootmall.model.Order;
 import com.linbirdie.springbootmall.model.OrderItem;
 import com.linbirdie.springbootmall.model.Product;
 import com.linbirdie.springbootmall.service.OrderService;
@@ -21,6 +22,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductDao productDao;
+
+    @Override
+    public Order getOrderById(Integer orderId) {
+        Order order = orderDao.getOrderById(orderId);
+
+        List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(orderId);
+
+        //因為想要同時回傳order 與orderItemList 這兩個object,
+        //我們可以在Order class 底下擴充 orderItemsList 這個變數
+        //如此只要回傳Order 即可
+        order.setOrderItemList(orderItemList);
+
+        return order;
+    }
 
     @Transactional
     @Override
